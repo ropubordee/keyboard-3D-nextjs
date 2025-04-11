@@ -24,11 +24,14 @@ const ProductCard = ({
       onClick={onClick}
       className={`hover:scale-105 ${isActive ? "scale-105" : ""}`}
     >
-      <AnimatedContainer deley={index * 0.2}
+      <AnimatedContainer
+        deley={index * 0.2}
         styles={`w-80 h-32 flex flex-row gap-4 rounded-xl transition-all duration-300 cursor-pointer ${
-          isActive ? "bg-gradient-to-r from-purple-600 to-indigo-600": "bg-stone-800"
+          isActive
+            ? "bg-gradient-to-r from-purple-600 to-indigo-600"
+            : "bg-stone-800"
         }`}
-      > 
+      >
         <Image
           src={imgSrc}
           alt="product"
