@@ -11,6 +11,8 @@ const Preview = ({ selectedProduct }: PreviewProps) => {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const modelRef = useRef<THREE.Object3D | null>(null);
 
+  const isMouseDownRef = useRef<boolean>(false);
+
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount || !selectedProduct) return;
@@ -58,41 +60,97 @@ const Preview = ({ selectedProduct }: PreviewProps) => {
 
     const loadModel = (modelSrc: string) => {
       loader.load(modelSrc, (gltf) => {
-
-        if(modelRef.current){
-          scene.remove(modelRef.current)
+        if (modelRef.current) {
+          scene.remove(modelRef.current);
         }
 
         const model = gltf.scene;
         model.scale.set(1, 1, 1);
-        model.position.set(0, 0, -2);
+        model.position.set(0, 12, -2);
         scene.add(model);
 
-        modelRef.current = model
-
+        modelRef.current = model;
       });
     };
 
-    loadModel(selectedProduct.modelSrc)
+    loadModel(selectedProduct.modelSrc);
 
     camera.position.z = 5;
+
+    const gravity = 0.002;
+    const bouncefactor = 0.3;
+    const groundY = 0;
+    let velocityY = 0;
+    let isBouncing = false;
 
     renderer.setAnimationLoop(animate);
     renderer.render(scene, camera);
 
     function animate() {
-      requestAnimationFrame(animate)
+      requestAnimationFrame(animate);
+
+      if (modelRef.current) {
+        velocityY -= gravity;
+        modelRef.current.position.y += velocityY;
+
+        if (modelRef.current.position.y <= gravity) {
+          modelRef.current.position.y = groundY;
+          velocityY *= -bouncefactor;
+          isBouncing = true;
+        } else {
+          isBouncing = false;
+        }
+        if (Math.abs(velocityY) < 0.01 && isBouncing) {
+          velocityY = 0;
+        }
+      }
+
       renderer.render(scene, camera);
     }
+    animate();
 
-    return ()=>{
-      if(mount){
-        mount.removeChild(renderer.domElement)
+    const handleMouseMove = (event: MouseEvent) => {
+      if (modelRef.current && isMouseDownRef.current) {
+        const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        modelRef.current.rotation.y = mouseX * Math.PI;
       }
-    }
+    };
 
+    const handleMouseDown = () => {
+      isMouseDownRef.current = true;
+    };
 
-  },[selectedProduct]);
+    const handleInteractionEnd = () => {
+      isMouseDownRef.current = false;
+      const animateRotationBack = () => {
+        if (modelRef.current) {
+          const modelRotation = modelRef.current.rotation.y;
+          if (Math.abs(modelRotation) > 0.01) {
+            modelRef.current.rotation.y -= modelRotation * 0.01;
+            requestAnimationFrame(animateRotationBack);
+          } else {
+            modelRef.current.rotation.y = 0;
+          }
+        }
+      };
+
+      animateRotationBack();
+    };
+
+    mount.addEventListener("mousemove", handleMouseMove);
+    mount.addEventListener("mousedown", handleMouseDown);
+    mount.addEventListener("mouseup", handleInteractionEnd);
+    mount.addEventListener("mouseleave", handleInteractionEnd);
+    return () => {
+      if (mount) {
+        mount.removeChild(renderer.domElement);
+      }
+      mount.removeEventListener("mousemove", handleMouseMove);
+      mount.removeEventListener("mousedown", handleMouseDown);
+      mount.removeEventListener("mouseup", handleInteractionEnd);
+      mount.removeEventListener("mouseleave", handleInteractionEnd);
+    };
+  }, [selectedProduct]);
   return (
     <div
       ref={mountRef}
