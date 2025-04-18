@@ -1,37 +1,9 @@
-'use client'
+"use client";
 import React from "react";
-import { FaGamepad, FaHandRock } from "react-icons/fa";
-import { FaBolt, FaKeyboard } from "react-icons/fa6";
 import FeaturesCard from "../FeaturesCard";
+import { features } from "@/mockdata/featuresdata";
 
 const Features = () => {
-  const features = [
-    {
-      icon: FaKeyboard,
-      title: "Compact Design",
-      description:
-        "Experience a sleek, compact design that frees up space for intense gaming sessions, allowing for more mouse movement and a cleaner setup.",
-    },
-    {
-      icon: FaBolt,
-      title: "RGB Backlighting",
-      description:
-        "Customize your keyboard with vibrant RGB backlighting, featuring dynamic lighting effects and millions of colors to match your gaming rig.",
-    },
-    {
-      icon: FaHandRock,
-      title: "Mechanical Switches",
-      description:
-        "Enjoy precise, tactile feedback with durable mechanical switches, ensuring fast response times and reliable performance during gameplay.",
-    },
-    {
-      icon: FaGamepad,
-      title: "Gaming Mode",
-      description:
-        "Activate gaming mode to disable the Windows key and avoid accidental interruptions, keeping you focused on the game.",
-    },
-  ];
-
   return (
     <div id="features" className="max-w-5xl mx-auto pt-8">
       <h2 className="text-2xl font-semibold pl-4 md:pl-16 pb-16">
@@ -40,11 +12,12 @@ const Features = () => {
       </h2>
       <div className="flex flex-wrap items-center justify-center gap-8 max-w-4xl">
         {features.map((feature, index) => (
-          <FeaturesCard key={index} 
-          index={index}
-          title={feature.title}
-          icon={feature.icon}
-          description={feature.description}
+          <FeaturesCard
+            key={index}
+            index={index}
+            title={feature.title}
+            icon={feature.icon}
+            description={feature.description}
           />
         ))}
       </div>
