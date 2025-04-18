@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 interface TextBottomFadeInProps{
     title: string;
-    textStyles: any; 
+    textStyles: string; 
 }
 
 const textVariants = {
